@@ -1,0 +1,6 @@
+{
+  "name": "default",
+  "admin-state": "enable",
+  "interface": [{"name": "ethernet-1/21.0"}]
+}
+

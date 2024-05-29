@@ -1,0 +1,77 @@
+- ethernet:
+    statistics:
+      clear:
+        include-members: []
+  packet-link-qualification:
+    cancel:
+      id: []
+    start:
+      id: []
+      qualification-profile: []
+  qos:
+    output:
+      queue-statistics:
+        clear: []
+        queue:
+        - {}
+  resource:
+    retry: []
+  statistics:
+    clear:
+      include-members: []
+  subinterface:
+  - bridge-table:
+      mac-duplication:
+        delete-all-macs: []
+        duplicate-entries:
+          mac:
+          - {}
+      mac-learning:
+        delete-all-macs: []
+        learnt-entries:
+          mac:
+          - {}
+    ipv4:
+      address:
+      - vrrp-group:
+        - statistics:
+            clear: []
+      arp:
+        delete-dynamic: []
+        neighbor:
+        - {}
+        virtual-ipv4-discovery:
+          address:
+          - statistics:
+              clear: []
+          statistics:
+            clear: []
+      dhcp-relay:
+        statistics:
+          clear: []
+    ipv6:
+      address:
+      - vrrp-group:
+        - statistics:
+            clear: []
+      dhcp-relay:
+        statistics:
+          clear: []
+      neighbor-discovery:
+        delete-dynamic: []
+        neighbor:
+        - {}
+        virtual-ipv6-discovery:
+          address:
+          - statistics:
+              clear: []
+          statistics:
+            clear: []
+    qos:
+      input:
+        policer-templates:
+          clear: []
+          policer:
+          - {}
+    statistics:
+      clear: []

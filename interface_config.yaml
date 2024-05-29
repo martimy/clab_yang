@@ -1,0 +1,8 @@
+subinterface:
+  description: "To Router2"
+  index: 0
+  admin-state: enable
+  ipv4:
+      admin-state: enable
+      address:
+        ip-prefix: "10.0.0.5/30"

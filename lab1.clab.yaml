@@ -1,0 +1,61 @@
+# Define the containerlab topology named "basic"
+name: lab1
+prefix: ""
+
+# Define default settings for nodes in the topology
+topology:
+  # Specify the default kind
+  defaults:
+    kind: linux
+
+  # Specify the defaults for each kind
+  kinds:
+    nokia_srlinux:
+      type: ixrd1
+      image: ghcr.io/nokia/srlinux:23.10.1
+    linux:
+      image: akpinar/alpine:latest
+      group: server
+
+  # Define individual nodes in the topology
+  nodes:
+    # Routers
+    router1:
+      kind: nokia_srlinux
+      mgmt-ipv4: 172.20.20.11  # Management IPv4 address for s1
+    router2:
+      kind: nokia_srlinux
+      mgmt-ipv4: 172.20.20.12
+    router3:
+      kind: nokia_srlinux
+      mgmt-ipv4: 172.20.20.13
+
+    # Servers
+    host1:
+      exec:
+        - ip addr add 192.168.1.11/24 dev eth1
+        - ip route replace default via 192.168.1.1 dev eth1
+    host2:
+      exec:
+        - ip addr add 192.168.2.11/24 dev eth1
+        - ip route replace default via 192.168.2.1 dev eth1
+    host3:
+      exec:
+        - ip addr add 192.168.3.11/24 dev eth1
+        - ip route replace default via 192.168.3.1 dev eth1
+
+  # Define links between nodes
+  links:
+    # Router to router links
+    - endpoints: ["router1:e1-11", "router2:e1-12"]
+    - endpoints: ["router2:e1-11", "router3:e1-12"]
+    - endpoints: ["router3:e1-11", "router1:e1-12"]
+
+    # Router to host links
+    - endpoints: ["router1:e1-21", "host1:eth1"]
+    - endpoints: ["router2:e1-21", "host2:eth1"]
+    - endpoints: ["router3:e1-21", "host3:eth1"]
+
+# Define management subnet information
+mgmt:
+  ipv4-subnet: 172.20.20.0/24

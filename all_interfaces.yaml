@@ -1,0 +1,22 @@
+interface:
+- admin-state: enable
+  name: ethernet-1/11
+  subinterface:
+    - admin-state: enable
+      description: To Router2
+      index: 0
+      ipv4:
+        admin-state: enable
+        address:
+          ip-prefix: 10.0.0.5/30
+
+- admin-state: enable
+  name: ethernet-1/12
+  subinterface:
+    - admin-state: enable
+      description: To Router3
+      index: 0
+      ipv4:
+        admin-state: enable
+        address:
+          ip-prefix: 10.0.0.9/30
