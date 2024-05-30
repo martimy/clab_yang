@@ -2,6 +2,10 @@
 
 This tutorial will guide you through the steps of configuring Nokia srlinux routers using the gNMIc and YANG models.
 
+The containerlab toplogy file `lab1.clab.yaml` creates the ring topology shown in the figure below:
+
+![Topology](ring2.png)
+
 ## Stating and Stopping the Lab
 
 To start the lab:
