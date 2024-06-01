@@ -43,7 +43,7 @@ Note that the containerlab (using the topology file) assigns names to devices an
 
 Before proceeding with this lab, please review this [Introduction to Nokia SR Linux](https://martimy.github.io/clab_srl_dcn/srlinux.html).
 
-### 1. Configure interfaces using CLI
+### Configure interfaces using CLI
 
 Interface configuration on the srlinux router involves three steps.
 
@@ -51,17 +51,15 @@ Interface configuration on the srlinux router involves three steps.
 2. Configure an IPv4 address on the subinterface
 3. Enable both the parent interface and the subinterface. Also enable ipv4 address (the interface can have multiple addresses, each can be enabled individually).
 
-Sine most people are familiar with using CLI to configure routers, these where we will start. The srlinux was built to support YANG model from the ground up, so the CLI also is based on YANG.
+Sine most people are familiar with using CLI to configure routers, this is where we will start. The srlinux was built to support YANG model from the ground up, so the CLI is based on YANG.
 
-**Use CLI**
-
-To use the CLI, the administrator must make all the changes in the Candidate store. Once all changes are made, the
+Use ssh to login (you can also use `docker exec -it router1 sr_cli`):
 
 ```
 $ ssh admin@router1
 ```
 
-Once the administrator logs in, they enter the running mode:
+Once logged in, you will be in the running mode:
 
 ```
 Welcome to the srlinux CLI.
@@ -129,16 +127,18 @@ A:router1#
 Current mode: + running
 ```
 
-That was a quick demonstration of using the CLI, but this lab will focus on using gNMIc and YANG to configure the router, so exit the router by pressing `CTRL-D`, or type `quit` and press `ENTER`.
+That was a brief demonstration of using the CLI, but this lab will focus on using gNMIc and YANG to configure the router, so exit the router by pressing `CTRL-D`, or type `quit` and press `ENTER`.
 
 ```
 A:router1# quit
 Connection to router1 closed.
 ```
 
-**Using gNMIc**
+### Introducing gNMIc
 
-The gNMIc tool requires access credentials and other information to be able to access routers. Instead of repeatedly supplying all of this information in the command line, we can use environment variables. So before using gNMIc, set the following environment variables:
+gNMIc is a gNMI (gRPC Network Management Interface) CLI (Command Line Interface) client and collector. It provides full support for gNMI RPCs (Remote Procedure Calls) including Capabilities, Get, Set, and Subscribe.
+
+The gNMIc tool requires credentials and other information to be able to access routers. Instead of repeatedly supplying all of this information in the command line, we can use environment variables. So before using gNMIc, you will need to set the following environment variables:
 
 ```
 export GNMIC_USERNAME=admin
@@ -185,7 +185,7 @@ $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=
 The previous command includes the following flags:
 
 - `-a`: Address of the target router (multiple targets can be included separated by commas).
-- `--path` Specifies the path to the specific configuration data (paths will be discussed later). Notice that the path includes the name of the interface and the index of the subinterface.
+- `--path` Specifies the path to the specific configuration data. Notice that the path includes the name of the interface and the index of the subinterface.
 - `-t config`: Specifies that only configuration data is requested (this excludes statistics, for example).
 
 The output shown above is in JSON format, which is the default. Use `flat` format to display the interface configuration in xpath-style paths:
@@ -199,7 +199,9 @@ srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/ad
 
 **gNMIc and XPath**
 
-gNMIc uses YANG [XPath](xpath.md) to specify the data being requested or updated. For instance, in the previous example, the gNMIc command `get` is used to get xpaths related to the interface configuration. It is also possible, using the gNMIc `path` command, to generate and search through the XPath-style paths extracted from a YANG file. Once paths are extracted from a YANG model, it is possible to utilize CLI search tools like `awk`, `sed` and `alike` to find the paths satisfying specific matching rules.
+gNMIc uses YANG [XPath](xpath.md) to specify the data being requested or updated. For instance, in the previous example, the gNMIc command `get` is used to get xpaths related to the interface configuration. The `flat` format displays the configuration in path style.
+
+It is also possible, using the gNMIc `path` command, to generate and search through the XPath-style paths extracted from a YANG file. Once paths are extracted from a YANG model, it is possible to utilize CLI search tools like `awk`, `sed` and `alike` to find the paths satisfying specific matching rules.
 
 
 **Exercises:**
