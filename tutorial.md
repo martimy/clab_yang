@@ -129,7 +129,7 @@ A:router1#
 Current mode: + running
 ```
 
-That was a quick demonstration of using the CLI, but this lab will focus on using gNMIc and YANG to configure the router, so exit the router by typing `quit` followed by `ENTER` or pressing `CTRL-D`.
+That was a quick demonstration of using the CLI, but this lab will focus on using gNMIc and YANG to configure the router, so exit the router by pressing `CTRL-D`, or type `quit` and press `ENTER`.
 
 ```
 A:router1# quit
@@ -138,7 +138,7 @@ Connection to router1 closed.
 
 **Using gNMIc**
 
-The gNMIc tool requires access credentials and other information to be able to access routers. Instead of repeatedly supplying all of this information in the command line, we can use environment variables instead. So before using gNMIc, set the following environment variables:
+The gNMIc tool requires access credentials and other information to be able to access routers. Instead of repeatedly supplying all of this information in the command line, we can use environment variables. So before using gNMIc, set the following environment variables:
 
 ```
 export GNMIC_USERNAME=admin
@@ -188,7 +188,8 @@ The previous command includes the following flags:
 - `--path` Specifies the path to the specific configuration data (paths will be discussed later). Notice that the path includes the name of the interface and the index of the subinterface.
 - `-t config`: Specifies that only configuration data is requested (this excludes statistics, for example).
 
-The output shown above is in JSON format, which is the default. Use `flat` format to display the
+The output shown above is in JSON format, which is the default. Use `flat` format to display the interface configuration in xpath-style paths:
+
 ```
 $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=0] -t config --format flat
 srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/admin-state: enable
@@ -196,7 +197,12 @@ srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/ad
 srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/admin-state: enable
 ```
 
-Exercise,
+**gNMIc and XPath**
+
+gNMIc uses YANG [XPath](xpath.md) to specify the data being requested or updated. For instance, in the previous example, the gNMIc command `get` is used to get xpaths related to the interface configuration. It is also possible, using the gNMIc `path` command, to generate and search through the XPath-style paths extracted from a YANG file. Once paths are extracted from a YANG model, it is possible to utilize CLI search tools like `awk`, `sed` and `alike` to find the paths satisfying specific matching rules.
+
+
+**Exercises:**
 
 - Use the `get` command again but remove the interface name and the subinterface index. Describe the output.
 - Why there is no IP address configured for the `mgmt0.0` interface?
@@ -205,7 +211,7 @@ Exercise,
 
 
 
-### 2. Configure interfaces using gNMI
+### 2. Configure Interfaces using gNMI
 
 Now we will use the gNMIc tool, instead of the CLI, to configure the interfaces on the other two routers.
 
