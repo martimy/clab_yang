@@ -22,6 +22,12 @@ To proceed with the lab, you will need a Linux VM. You also need to install the 
 - [Containerlab](https://containerlab.dev/install/)
 - [gNMIc](https://gnmic.openconfig.net/install/)
 
+Clone this lab to a directory in your machine:
+
+```
+$ git clone https://github.com/martimy/clab_yang [folder name]
+```
+
 ## Configuration
 
 Follow the instructions in this [Tutorial](tutorial.md) to start lab and configure the routers.

@@ -20,9 +20,28 @@ To stop the lab:
 $ sudo clab destroy [-t lab1.clab.yaml]
 ```
 
+## YANG Support
 
-## Configuration Task
+SR Linux is built to support YANG data models. Therefore, all management interfaces (CLI, gNMI, and JSON-RPC) are based on a common YANG models for configuration, state, and operational tasks. For example, the CLI command tree is derived the YANG models loaded into the system and a gNMI client can use the models to configure the system.
 
+SR Linux supports the following YANG data models:
+
+- Nokia vendor-specific data models
+- OpenConfig vendor-neutral data models
+
+You can use the OpenConfig data models together with the SR Linux data models to configure network elements, using a CLI console or SSH connection or management-interface RPCs (gNMI) for communications between the clients and routers. The SR Linux data models offer a more complete representation of the capabilities of the SR Linux network elements, because they include vendor-specific features and functions that the OpenConfig data models do not describe.
+
+
+## Configuration Tasks
+
+This tutorial will guide you through the steps of configuring the devices in the network so that hosts will be able to communicate with each other. The configuration tasks include:
+
+- Configuring interfaces and subinterfaces (assign IPv4 addresses).
+- Configuring OSPF routing protocol.
+
+Note that the containerlab (using the topology file) assigns names to devices and IP addresses to the hosts. It also connects all devices to a management network 172.20.20.0/24 through the devices' management interface. All configuration tasks in the tutorial are performed through the management network.
+
+Before proceeding with this lab, please review this [Introduction to Nokia SR Linux](https://martimy.github.io/clab_srl_dcn/srlinux.html).
 
 ### 1. Configure interfaces using CLI
 
@@ -52,14 +71,6 @@ Type 'help' (and press <ENTER>) if you need any help using this.
 A:router1#
 Current mode: + running
 ```
-
-In Nokia SR Linux, the operational modes provide different functionalities and capabilities for managing the system. Here's a brief description of each mode:
-
-1. Running Mode: This mode reflects the current active configuration of the system.
-2. Candidate Mode: This mode allows for editing and reviewing the system configuration before committing it to the running mode. It provides a safe environment to make and validate changes before applying them.
-3. Show Mode: This mode is used to display the current state and configuration of the system. It is essentially a read-only mode for monitoring purposes.
-4. State Mode: This mode provides detailed information about the operational state of various system components. It goes beyond the configuration to include real-time data such as interface statistics, protocol states, and other dynamic operational details.
-5. OC (Operational Configuration) Mode: This mode combines the operational and configuration views, focusing on the dynamic aspects of the system that can be altered during runtime. It enables users to see how changes in configuration affect the operational state and make adjustments accordingly.
 
 To make any configuration changes, you must enter the Candidate mode:
 
@@ -137,7 +148,7 @@ export GNMIC_ENCODING=json_ietf
 ```
 
 ```
-$ source set_env.sh
+$ source env.sh
 ```
 
 First, you can use the gNMIc's `get` command to view in the interface configuration you just created on the router:
