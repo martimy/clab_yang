@@ -30,7 +30,7 @@ $ git clone https://github.com/martimy/clab_yang [folder name]
 
 ## Configuration
 
-Follow the instructions in this [Tutorial](tutorial.md) to start lab and configure the routers.
+Follow the instructions in this [tutorial](docs/tutorial.md) to start lab and configure the routers.
 
 ## Links
 
