@@ -43,7 +43,7 @@ Note that the containerlab (using the topology file) assigns names to devices an
 
 Before proceeding with this lab, please review this [Introduction to Nokia SR Linux](https://martimy.github.io/clab_srl_dcn/srlinux.html).
 
-### Configure interfaces using CLI
+### Configure an Interface using CLI
 
 Interface configuration on the srlinux router involves three steps.
 
@@ -162,7 +162,53 @@ The gNMIc tool requires credentials and other information to be able to access r
 $ source env.sh
 ```
 
-First, you can use the gNMIc's `get` command to view in the interface configuration you just created on the router:
+**Capabilities**
+
+gNMIc 'capabilities' command retrieves the set of capabilities supported by the target system. These capabilities include:
+
+- gNMI version
+- available data models
+- supported encodings
+- gNMI extensions
+
+This allows gNMIc to retrieve the set of models that the target supports, which can then be specified in subsequent commands.
+
+Applying the next command will show a long list of capabilities supported by the router, including a list of supported encoding (the environment variables you set earlier specify the encoding to be JSON_IETF).
+
+```
+$ gnmic -a router1 capabilities
+gNMI version: 0.10.0
+supported models:
+  - urn:srl_nokia/aaa:srl_nokia-aaa, Nokia, 2023-10-31
+...
+supported encodings:
+  - JSON_IETF
+  - PROTO
+  - ASCII
+...
+```
+
+You can search the output for specific capabilities, such as the support of interface and OSPF configuration:
+
+```
+$ gnmic -a router1 capabilities | awk -F  ':' '/interface/ {print $3}'
+srl_nokia-if-ip, Nokia, 2023-07-31
+srl_nokia-if-mpls, Nokia, 2021-06-30
+srl_nokia-interfaces, Nokia, 2023-10-31
+<output committed>
+```
+
+```
+$ gnmic -a router1 capabilities | awk -F  ':' '/ospf/ {print $3}'
+srl_nokia-ospf, Nokia, 2023-07-31
+srl_nokia-tools-ospf, Nokia, 2023-03-31
+```  
+
+We will use these capabilities to configure the routers.
+
+**Using get Command**
+
+You can use the gNMIc's `get` command to view in the interface configuration you just created on the router:
 
 ```
 $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=0] -t config
@@ -224,21 +270,43 @@ It is also possible, using the gNMIc `path` command, to generate and search thro
 
 
 
-### 2. Configure Interfaces using gNMI
+### Configure Interfaces using gNMIc
 
-Now we will use the gNMIc tool, instead of the CLI, to configure the interfaces on the other two routers.
+Now we will use the gNMIc tool to configure the interfaces on the other two routers. Note that any configuration update using the gNMIc will take effect immediately (i.e. no candidate configuration).
 
 To change the configuration (add, update, or delete), we need to use the `set` command. The command can be applied with several flags, including:
 
 - `--update-path`: Specifies the path in the YANG model to the configuration item to be updated.
 - `--update-value`: Provides the new value for the specified configuration item, either as a value or as a JSON object.
 
-Since the all routers have similar configuration, we can use one command for all routers. The following command create the subinterface with index 0 (the index can be any number in the range 0 to 9999).
+Whenever routers have similar configuration, we can use one command for all routers by including the target routers' addresses in the `-a` flag. The following command creates the subinterface with index 0 (the index can be any number in the range 0 to 9999). The results will indicate if the update is successful.
 
 ```
 $ gnmic -a router2,router3 set \
 --update-path /interface[name=ethernet-1/21]/subinterface[index=0] \
 --update-value '{"index": 0}'
+[router3] {
+[router3]   "source": "router3",
+[router3]   "timestamp": 1717337639373093999,
+[router3]   "time": "2024-06-02T11:13:59.373093999-03:00",
+[router3]   "results": [
+[router3]     {
+[router3]       "operation": "UPDATE",
+[router3]       "path": "interface[name=ethernet-1/21]/subinterface[index=0]"
+[router3]     }
+[router3]   ]
+[router3] }
+[router2] {
+[router2]   "source": "router2",
+[router2]   "timestamp": 1717337639403358896,
+[router2]   "time": "2024-06-02T11:13:59.403358896-03:00",
+[router2]   "results": [
+[router2]     {
+[router2]       "operation": "UPDATE",
+[router2]       "path": "interface[name=ethernet-1/21]/subinterface[index=0]"
+[router2]     }
+[router2]   ]
+[router2] }
 ```
 
 The IP address for each subinterface is different so we use separate command for each router:
@@ -247,32 +315,53 @@ The IP address for each subinterface is different so we use separate command for
 $ gnmic -a router2 set \
 --update-path /interface[name=ethernet-1/21]/subinterface[index=0]/ipv4 \
 --update-value '{"address": [{"ip-prefix": "192.168.2.1/24"}]}'
+<output omitted>
 $ gnmic -a router3 set \
 --update-path /interface[name=ethernet-1/21]/subinterface[index=0]/ipv4 \
 --update-value '{"address": [{"ip-prefix": "192.168.3.1/24"}]}'
+<output omitted>
 ```
 
-Finally, we enable all interfaces, subinterfaces, and the IPv4 addresses:
+Finally, we enable all subinterfaces and the IPv4 addresses:
 
 ```
 $ gnmic -a router2,router3 set \
---update-path /interface[name=ethernet-1/21]/admin-state \
---update-value enable \
 --update-path /interface[name=ethernet-1/21]/subinterface[index=0]/admin-state \
 --update-value enable \
 --update-path /interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/admin-state \
 --update-value enable
 ```
 
-3. Create a network instance
+Verify the configuring success using the `get` command as above:
 
-if you try to ping from a host to one of the routers, the ping will fail:
+```
+$ gnmic -a router2,router3 get --path /interface[name=ethernet-1/21] -t config --format flat
+[router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/admin-state: enable
+[router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/admin-state: enable
+[router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/index: 0
+[router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/ipv4/address.0/ip-prefix: 192.168.3.1/24
+[router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/ipv4/admin-state: enable
+[router3]
+[router2] srl_nokia-interfaces:interface[name=ethernet-1/21]/admin-state: enable
+[router2] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/admin-state: enable
+[router2] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/index: 0
+[router2] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/ipv4/address.0/ip-prefix: 192.168.2.1/24
+[router2] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/ipv4/admin-state: enable
+[router2]
+```
+
+### Create a Network Instance
+
+If you try to ping from a host to one of the routers, the ping will fail:
 
 ```
 $ docker exec host1 ping 192.168.1.1
 ```
 
-The reason is that the subinterfaces we just configured must be associated with a network-instance (aka VRF). Initially, the only network-instance configured is the `mgmt`, in which all management interfaces belong (this instance will be ignored for now). Use the following command to verify. Note the output JSON shows that the "mgmt" network-instance has interface "mgmt0.0", which is the interface that we are using to configure the router.
+The reason is that the subinterfaces we just configured must be associated with a network-instance (aka VRF). Initially, the only network-instance configured on the router is the `mgmt`, in which all management interfaces belong.
+
+The following command shows that the "mgmt" network-instance has one interface, "mgmt0.0", which is the interface that we are using to configure the routers.
+
 
 ```
 $ gnmic -a router1 get --path /network-instance -t config
