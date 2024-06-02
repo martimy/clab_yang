@@ -219,6 +219,11 @@ You can use the gNMIc's `get` command to view in the interface configuration you
 
 ```
 $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=0] -t config
+```
+<details>
+<summary>Output</summary>
+
+```
 [
   {
     "source": "router1",
@@ -245,6 +250,7 @@ $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=
   }
 ]
 ```
+</details>
 
 The previous command includes the following flags:
 
