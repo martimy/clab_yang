@@ -603,17 +603,24 @@ updates:
             admin-state: enable
             address:
               - ip-prefix: 10.0.0.6/30
+  - path: /network-instance[name=default]
+    value:
+      interface:
+        - name: ethernet-1/11.0
+        - name: ethernet-1/12.0
 ```
 
 The file includes these components:
 
 - updates: This is a list that contains one or more update entries. Each entry specifies a path and the value to set at that path.
-- path: This specifies the path to the interface configuration that is being updated.
+- path: This specifies the path to the configuration that is being updated. There are two paths.
 - value: This section contains the configuration details for the specified path.
 
-But one of the features of the `--request-file` is the ability to add per-target template variables using a [Go Text template](https://developer.hashicorp.com/nomad/tutorials/templates/go-template-syntax).
+The file creates a subinterface for two interfaces connecting the routers then add the interfaces to the "default" network instance.
 
-In the previous file, we need to set the IP address for each interface and for each router. Without going into the details of the Go Template syntax, the above file can be modified as follows:
+One of the features of the `--request-file` is the ability to add per-target template variables using a [Go Text template](https://developer.hashicorp.com/nomad/tutorials/templates/go-template-syntax).
+
+In the previous file, we need to set the IP address for each interface and for each router, so we will need a file for each router. We can use templates to automate this process. Without going into the details of the Go Template syntax, the above file can be modified as follows:
 
 ```yaml
 updates:
@@ -637,7 +644,6 @@ updates:
 {{- end }}
 ```
 
-Note also that the file add each interface to the network-instance "default".
 
 The variables file will include the values needed for each router/interface:
 
