@@ -188,14 +188,21 @@ supported encodings:
 ...
 ```
 
-You can search the output for specific capabilities, such as the support of interface and OSPF configuration:
+You can search the output for specific capabilities, such as the support of interface, network instances, and OSPF configuration:
 
 ```
 $ gnmic -a router1 capabilities | awk -F  ':' '/interface/ {print $3}'
 srl_nokia-if-ip, Nokia, 2023-07-31
 srl_nokia-if-mpls, Nokia, 2021-06-30
 srl_nokia-interfaces, Nokia, 2023-10-31
-<output committed>
+...
+```
+
+```
+$ gnmic -a router1 capabilities | awk -F  ':' '/network-instance/ {print $3}'
+...
+srl_nokia-network-instance, Nokia, 2023-10-31
+...
 ```
 
 ```
@@ -269,7 +276,6 @@ It is also possible, using the gNMIc `path` command, to generate and search thro
   - Repeat the `get` command using the option `-t state`
 
 
-
 ### Configure Interfaces using gNMIc
 
 Now we will use the gNMIc tool to configure the interfaces on the other two routers. Note that any configuration update using the gNMIc will take effect immediately (i.e. no candidate configuration).
@@ -279,7 +285,7 @@ To change the configuration (add, update, or delete), we need to use the `set` c
 - `--update-path`: Specifies the path in the YANG model to the configuration item to be updated.
 - `--update-value`: Provides the new value for the specified configuration item, either as a value or as a JSON object.
 
-Whenever routers have similar configuration, we can use one command for all routers by including the target routers' addresses in the `-a` flag. The following command creates the subinterface with index 0 (the index can be any number in the range 0 to 9999). The results will indicate if the update is successful.
+Whenever routers have similar configuration, we can use one command for all routers by including the target routers' addresses in the `-a` flag. The following command creates a subinterface with index 0 (the index can be any number in the range 0 to 9999). The output indicates if the update is successful.
 
 ```
 $ gnmic -a router2,router3 set \
@@ -332,7 +338,7 @@ $ gnmic -a router2,router3 set \
 --update-value enable
 ```
 
-Verify the configuring success using the `get` command as above:
+Verify the configuration success using the `get` command as above:
 
 ```
 $ gnmic -a router2,router3 get --path /interface[name=ethernet-1/21] -t config --format flat
@@ -428,9 +434,9 @@ PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
 ...
 ```
 
-For more efficiency, we you can combine all three commands using a configuration file.
+Using `update-value` is useful for small configuration changes. As configuration updates gets more elaborate, we will need a more efficient approach. For that we can use a configuration file.
 
-Create a file `payload.json` and add the following JSON object:
+Create a file `instance_config.json` and include the following JSON object:
 
 ```
 {
@@ -440,7 +446,7 @@ Create a file `payload.json` and add the following JSON object:
 }
 ```
 
-or you can use YAML in file `payload.yaml`:
+or you can use YAML in file `instance_config.yaml`:
 
 ```
 name: default
@@ -451,20 +457,20 @@ interface:
 
 
 ```
-gnmic -a router2,router3 set \
+$ gnmic -a router2,router3 set \
 --update-path /network-instance[name=default] \
---update-file payload.json
+--update-file config/instance_config.json
 ```
 
 Let's verify ping
 
 ```
-vagrant@ubuntu2004:~/myclabs/yang_lab$ docker exec host2 ping 192.168.2.1
+$ docker exec host2 ping 192.168.2.1
 PING 192.168.2.1 (192.168.2.1) 56(84) bytes of data.
 64 bytes from 192.168.2.1: icmp_seq=1 ttl=64 time=18.2 ms
 64 bytes from 192.168.2.1: icmp_seq=2 ttl=64 time=1.59 ms
 ^C
-vagrant@ubuntu2004:~/myclabs/yang_lab$ docker exec host3 ping 192.168.3.1
+$ docker exec host3 ping 192.168.3.1
 PING 192.168.3.1 (192.168.3.1) 56(84) bytes of data.
 64 bytes from 192.168.3.1: icmp_seq=1 ttl=64 time=11.4 ms
 64 bytes from 192.168.3.1: icmp_seq=2 ttl=64 time=5.11 ms
