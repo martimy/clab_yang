@@ -1,0 +1,19 @@
+updates:
+{{ $target := index .Vars .TargetName }}
+{{- range $interface := index $target "interfaces" }}
+  - path: "/interface[name={{ index $interface "name" }}]"
+    value:
+      admin-state: enable
+      description: {{ index $interface "description" | default "" }}
+      subinterface:
+        - index: 0
+          admin-state: enable
+          ipv4:
+            admin-state: enable
+            address:
+              - ip-prefix: {{ index $interface "ipv4-prefix" }}
+  - path: "/network-instance[name=default]"
+    value:
+      interface:
+        name: {{ index $interface "name" }}{{".0"}}
+{{- end }}

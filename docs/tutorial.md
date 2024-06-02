@@ -536,7 +536,7 @@ Now we need to configure the remaining interfaces between each pair of routers. 
 
 Edit a file `interfaces_config.yaml` as follows:
 
-```
+```yaml
 interface:
 - admin-state: enable
   name: ethernet-1/11
@@ -577,9 +577,7 @@ $ gnmic -a router1 get --path /interface -t config --format flat
 ### Using `request-file` Flag
 
 
-The `--request-file` flag will simplify the process even further by combining multiple paths and operations, update, replace or delete in one file.
-
-Edite a file named `interface_req.yaml`
+The `--request-file` flag simplifies the configuration process further by combining multiple paths and operations (update, replace or delete) in one file. The configuration file that can be used for router2 looks like the following:
 
 ```yaml
 updates:
@@ -591,6 +589,7 @@ updates:
         - index: 0
           admin-state: enable
           ipv4:
+            admin-state: enable
             address:
               - ip-prefix: 10.0.0.9/30
   - path: /interface[name=ethernet-1/12]
@@ -601,24 +600,93 @@ updates:
         - index: 0
           admin-state: enable
           ipv4:
+            admin-state: enable
             address:
               - ip-prefix: 10.0.0.6/30
 ```
 
-Use the following `set` command for Router2.
+The file includes these components:
+
+- updates: This is a list that contains one or more update entries. Each entry specifies a path and the value to set at that path.
+- path: This specifies the path to the interface configuration that is being updated.
+- value: This section contains the configuration details for the specified path.
+
+But one of the features of the `--request-file` is the ability to add per-target template variables using a [Go Text template](https://developer.hashicorp.com/nomad/tutorials/templates/go-template-syntax).
+
+In the previous file, we need to set the IP address for each interface and for each router. Without going into the details of the Go Template syntax, the above file can be modified as follows:
+
+```yaml
+updates:
+{{ $target := index .Vars .TargetName }}
+{{- range $interface := index $target "interfaces" }}
+  - path: "/interface[name={{ index $interface "name" }}]"
+    value:
+      admin-state: enable
+      description: {{ index $interface "description" | default "" }}
+      subinterface:
+        - index: 0
+          admin-state: enable
+          ipv4:
+            admin-state: enable
+            address:
+              - ip-prefix: {{ index $interface "ipv4-prefix" }}
+  - path: "/network-instance[name=default]"
+    value:
+      interface:
+        name: {{ index $interface "name" }}{{".0"}}
+{{- end }}
+```
+
+Note also that the file add each interface to the network-instance "default".
+
+The variables file will include the values needed for each router/interface:
+
+```yaml
+router1:
+  interfaces:
+    - name: ethernet-1/11
+      description: "router1_to_router2"
+      ipv4-prefix: "10.0.0.5/30"
+    - name: ethernet-1/12
+      description: "router1_to_router3"
+      ipv4-prefix: "10.0.0.14/30"
+
+router2:
+  interfaces:
+    - name: ethernet-1/11
+      description: "router2_to_router3"
+      ipv4-prefix: "10.0.0.9/30"
+    - name: ethernet-1/12
+      description: "router2_to_router1"
+      ipv4-prefix: "10.0.0.6/30"
+
+router3:
+  interfaces:
+    - name: ethernet-1/11
+      description: "router3_to_router1"
+      ipv4-prefix: "10.0.0.13/30"
+    - name: ethernet-1/12
+      description: "router3_to_router2"
+      ipv4-prefix: "10.0.0.10/30"
+```
+
+Use the following `set` command for router1, router2, and router3.
 
 ```
-$ gnmic -a router2 set --request-file interface_req.yaml
+$ gnmic -a router1,router2,router3 set --request-file config/interfaces_request.yaml
 ```
 
-Edit the file for router3 and repeat
+Once again, you can check the configuration of all interfaces using the `get` command:
+
+```
+$ gnmic -a router1,router2,router3 get --path /interface -t config --format flat
+```
 
 
+### Configure OSPF
 
-### 3. Configure OSPF
 
-
-We will use the last technique to configure OSFP. The file `opsf.yaml` includes basic OSPF configuration that we can use with the command `set --request-file` to configure each router. However, we will need to assign each router a unique router-id. Instead if editing the file manually for each target router, the request-file can be written as Go Text template. The router-id values are written in separate variables file (with `_vars` added to the name):
+We will use the last technique to configure OSFP. The file `opsf_config.yaml` includes basic OSPF configuration that we can use with the command `set --request-file` to configure each router. We will need to assign each router a unique router-id, so we can use Go Text template again. The router-id values are written in separate variables file (with `_vars` added to the name):
 
 ```
 updates:
@@ -641,7 +709,7 @@ updates:
           interface-name: ethernet-1/21.0
 ```
 
-The variables file `ospf_vars.yaml`:
+The variables file `ospf_config_vars.yaml`:
 
 ```
 router1:
@@ -655,8 +723,40 @@ router3:
 Finally, we apply the OSPF configuration:
 
 ```
-$ gnmic -a router1,router2,router3 set --request-file ospf.yaml
+$ gnmic -a router1,router2,router3 set --request-file ospf_config.yaml
 ```
+
+This concludes all configuration required to establish end-to-end connectivity between all hosts in the network. You can verify this using ping:
+
+```
+$ docker exec host1 ping 192.168.2.11
+```
+
+Check the OSPF configuration:
+
+```
+$ gnmic -a router1 get --path /network-instance/protocols/ospf/ -t config --format flat
+/srl_nokia-network-instance:network-instance.0/name: default
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/admin-state: enable
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/area-id: 0.0.0.0
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/interface.0/admin-state: enable
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/interface.0/interface-name: ethernet-1/11.0
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/interface.1/admin-state: enable
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/interface.1/interface-name: ethernet-1/12.0
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/interface.2/admin-state: enable
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/interface.2/interface-name: ethernet-1/21.0
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/name: default
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/router-id: 1.1.1.1
+/srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/version: srl_nokia-ospf-types:ospf-v2
+```
+
+You can also get the routing table (although you will probably need to format it using other tools):
+
+```
+$ gnmic -a router1 get --path /network-instance[name=default]/route-table
+```
+
+This concludes the tutorial.
 
 ## Links
 
