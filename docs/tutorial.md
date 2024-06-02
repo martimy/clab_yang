@@ -220,6 +220,7 @@ You can use the gNMIc's `get` command to view in the interface configuration you
 ```
 $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=0] -t config
 ```
+
 <details>
 <summary>Output</summary>
 
@@ -262,10 +263,17 @@ The output shown above is in JSON format, which is the default. Use `flat` forma
 
 ```
 $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=0] -t config --format flat
+```
+
+<details>
+<summary>Output</summary>
+
+```
 srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/admin-state: enable
 srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/address.0/ip-prefix: 192.168.1.1/24
 srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/admin-state: enable
 ```
+</details>
 
 **gNMIc and XPath**
 
@@ -297,6 +305,12 @@ Whenever routers have similar configuration, we can use one command for all rout
 $ gnmic -a router2,router3 set \
 --update-path /interface[name=ethernet-1/21]/subinterface[index=0] \
 --update-value '{"index": 0}'
+```
+
+<details>
+<summary>Output</summary>
+
+```
 [router3] {
 [router3]   "source": "router3",
 [router3]   "timestamp": 1717337639373093999,
@@ -320,6 +334,7 @@ $ gnmic -a router2,router3 set \
 [router2]   ]
 [router2] }
 ```
+</details>
 
 The IP address for each subinterface is different so we use separate command for each router:
 
@@ -348,6 +363,12 @@ Verify the configuration success using the `get` command as above:
 
 ```
 $ gnmic -a router2,router3 get --path /interface[name=ethernet-1/21] -t config --format flat
+```
+
+<details>
+<summary>Output</summary>
+
+```
 [router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/admin-state: enable
 [router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/admin-state: enable
 [router3] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/index: 0
@@ -361,6 +382,7 @@ $ gnmic -a router2,router3 get --path /interface[name=ethernet-1/21] -t config -
 [router2] srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface.0/ipv4/admin-state: enable
 [router2]
 ```
+</details>
 
 ### Create a Network Instance
 
@@ -377,6 +399,12 @@ The following command shows that the "mgmt" network-instance has one interface, 
 
 ```
 $ gnmic -a router1 get --path /network-instance -t config
+```
+
+<details>
+<summary>Output</summary>
+
+```
 [
   {
     "source": "router1",
@@ -414,6 +442,7 @@ $ gnmic -a router1 get --path /network-instance -t config
   }
 ]
 ```
+</details>
 
 We will need to create a network-instance named "default" (the "default" network-instance in srlinux has special features). The following sequence of updates create a network-instance named "default", enable it, then associate the previously configured interface.
 
@@ -489,6 +518,12 @@ Use flat format to verify configuration:
 ```
 $ gnmic -a router1,router2,router3 get --path /network-instance[name=default] -t
 config --format flat
+```
+
+<details>
+<summary>Output</summary>
+
+```
 [router3] srl_nokia-network-instance:network-instance[name=default]/admin-state: enable
 [router3] srl_nokia-network-instance:network-instance[name=default]/interface.0/name: ethernet-1/21.0
 [router3]
@@ -499,6 +534,7 @@ config --format flat
 [router2] srl_nokia-network-instance:network-instance[name=default]/interface.0/name: ethernet-1/21.0
 [router2]
 ```
+</details>
 
 ### Saving Configuration
 
@@ -513,6 +549,12 @@ However, containerlab provides a convenient way to save the configuration for al
 
 ```
 $ sudo clab save
+```
+
+<details>
+<summary>Output</summary>
+
+```
 INFO[0000] Parsing & checking topology file: lab1.clab.yaml
 INFO[0004] saved SR Linux configuration from router3 node. Output:
 /system:
@@ -526,6 +568,7 @@ INFO[0004] saved SR Linux configuration from router2 node. Output:
 /system:
     Saved current running configuration as initial (startup) configuration '/etc/opt/srlinux/config.json'
 ```
+</details>
 
 The output shows that the startup configuration is save in router's directory `/etc/opt/srlinux/config.json`. In your host machine, this file is saved under individual router's directory in the `clab-lab1` directory.
 
@@ -748,6 +791,12 @@ Check the OSPF configuration:
 
 ```
 $ gnmic -a router1 get --path /network-instance/protocols/ospf/ -t config --format flat
+```
+
+<details>
+<summary>Output</summary>
+
+```
 /srl_nokia-network-instance:network-instance.0/name: default
 /srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/admin-state: enable
 /srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/area.0/area-id: 0.0.0.0
@@ -761,6 +810,7 @@ $ gnmic -a router1 get --path /network-instance/protocols/ospf/ -t config --form
 /srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/router-id: 1.1.1.1
 /srl_nokia-network-instance:network-instance.0/protocols/srl_nokia-ospf:ospf/instance.0/version: srl_nokia-ospf-types:ospf-v2
 ```
+</details>
 
 You can also get the routing table (although you will probably need to format it using other tools):
 
