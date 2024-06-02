@@ -53,11 +53,14 @@ Interface configuration on the srlinux router involves three steps.
 
 Sine most people are familiar with using CLI to configure routers, this is where we will start. The srlinux was built to support YANG model from the ground up, so the CLI is based on YANG.
 
-Use ssh to login (you can also use `docker exec -it router1 sr_cli`):
+
+Make sure the lab is deployed (see above) then use SSH to login to router1 (you can also use `docker exec -it router1 sr_cli`):
 
 ```
 $ ssh admin@router1
 ```
+
+The username/password, if required, are *admin/NokiaSrl1*.
 
 Once logged in, you will be in the running mode:
 
@@ -70,51 +73,51 @@ A:router1#
 Current mode: + running
 ```
 
-To make any configuration changes, you must enter the Candidate mode:
+To make any configuration changes, you must enter the Candidate mode. Once inside the candidate mode (the bottom of the screen shows the current mode), you can update the configuration using the `set` command. Use the tab key to display a menu that shows all the next possible keywords then use the navigation keys to select the required keyword. At the end you need to type the address "192.168.1.1/24".
 
 ```
+Welcome to the srlinux CLI.
+Type 'help' (and press <ENTER>) if you need any help using this.
+
+--{ running }--[  ]--
 A:router1# enter candidate
-```
 
-Once inside the candidate mode (the bottom of the screen shows the current mode), you can update the configuration using the `set` command. Use the tab key to display a menu that shows all the next possible keywords then use the navigation keys to select the required keyword. At the end you need to type the address "192.168.1.1/24".
-
-```
-set /interface ethernet-1/21 admin-state enable subinterface 0 admin-state enable ipv4 address 192.168.1.1/24
+--{ candidate shared default }--[  ]--
+A:router1# set /interface ethernet-1/21 admin-state enable subinterface 0 admin-state enable ipv4 admin-state enable address 192.168.1.1/24
 ```
 
 Type `diff` to view the configuration changes you made.
 
-``` {missing ipv4 enable}
+```
 A:router1# diff
-+     interface ethernet-1/21 {
-+         admin-state enable
+      interface ethernet-1/21 {
 +         subinterface 0 {
 +             admin-state enable
 +             ipv4 {
++                 admin-state enable
 +                 address 192.168.1.1/24 {
 +                 }
 +             }
 +         }
-+     }
-
---{ +* candidate shared default }--[  ]--
-A:router1#
+      }
 ```
 
 Repeat the command using the `flat` option:
 
 ```
 A:router1# diff flat
-insert / interface ethernet-1/21
-insert / interface ethernet-1/21 admin-state enable
 insert / interface ethernet-1/21 subinterface 0
 insert / interface ethernet-1/21 subinterface 0 admin-state enable
 insert / interface ethernet-1/21 subinterface 0 ipv4
+insert / interface ethernet-1/21 subinterface 0 ipv4 admin-state enable
 insert / interface ethernet-1/21 subinterface 0 ipv4 address 192.168.1.1/24
-
---{ +* candidate shared default }--[  ]--
-A:router1#
 ```
+
+The `set` command updates the configuration as follows:
+
+- Creates a subinterface 0 for the parent interface `ethernet-1/21` and enables it (the parent interface is enabled by clab).
+- Creates an IPv4 address and enables it as well.
+
 
 These configuration changes are not committed yet, so they have no affect on the running configuration. To commit the changes, use `commit now`, which will apply the configuration and move you back to the running mode (if the configuration includes error, you will not be able to commit the changes).
 
@@ -127,6 +130,19 @@ A:router1#
 Current mode: + running
 ```
 
+In the running mode, you can verify the status of the interface using `show` command:
+
+```
+A:router1# show interface ethernet-1/21.0
+==============================================================================
+  ethernet-1/21.0 is up
+    Network-instances:
+    Encapsulation   : null
+    Type            : routed
+    IPv4 addr    : 192.168.1.1/24 (static, None)
+==============================================================================
+```
+
 That was a brief demonstration of using the CLI, but this lab will focus on using gNMIc and YANG to configure the router, so exit the router by pressing `CTRL-D`, or type `quit` and press `ENTER`.
 
 ```
@@ -136,16 +152,11 @@ Connection to router1 closed.
 
 ### Introducing gNMIc
 
-gNMIc is a gNMI (gRPC Network Management Interface) CLI (Command Line Interface) client and collector. It provides full support for gNMI RPCs (Remote Procedure Calls) including Capabilities, Get, Set, and Subscribe.
+gNMIc is a gNMI (gRPC Network Management Interface) CLI (Command Line Interface) client and collector. It provides full support for gNMI RPCs (Remote Procedure Calls) including Capabilities, Get, Set, and Subscribe. Please consult the [gNMIc documentation](https://gnmic.openconfig.net/) for details.
 
-The gNMIc tool requires credentials and other information to be able to access routers. Instead of repeatedly supplying all of this information in the command line, we can use environment variables. So before using gNMIc, you will need to set the following environment variables:
+![gnmic](rpc_gnmic.png)
 
-```
-export GNMIC_USERNAME=admin
-export GNMIC_PASSWORD=NokiaSrl1!
-export GNMIC_SKIP_VERIFY=true
-export GNMIC_ENCODING=json_ietf
-```
+The gNMIc tool requires credentials and other information to be able to access routers. Instead of repeatedly supplying all of this information in the command line, we can use environment variables. So before using gNMIc, you will need to set the environment variables:
 
 ```
 $ source env.sh
@@ -158,8 +169,8 @@ $ gnmic -a router1 get --path /interface[name=ethernet-1/21]/subinterface[index=
 [
   {
     "source": "router1",
-    "timestamp": 1716745564727965443,
-    "time": "2024-05-26T14:46:04.727965443-03:00",
+    "timestamp": 1717336911489635846,
+    "time": "2024-06-02T11:01:51.489635846-03:00",
     "updates": [
       {
         "Path": "srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]",
