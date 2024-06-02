@@ -530,7 +530,7 @@ $ sudo clab destroy
 ```
 
 
-## More Interface Configuration
+### More Interface Configuration
 
 Now we need to configure the remaining interfaces between each pair of routers. Since we now all the elements needed for the configuration, we can create a JSON (or YAML) file that perform all the steps needed.
 
@@ -686,7 +686,7 @@ $ gnmic -a router1,router2,router3 get --path /interface -t config --format flat
 ### Configure OSPF
 
 
-We will use the last technique to configure OSFP. The file `opsf_config.yaml` includes basic OSPF configuration that we can use with the command `set --request-file` to configure each router. We will need to assign each router a unique router-id, so we can use Go Text template again. The router-id values are written in separate variables file (with `_vars` added to the name):
+We will use the last technique to configure OSPF. The file `ospf_config.yaml` includes basic OSPF configuration that we can use with the command `set --request-file` to configure each router. We will need to assign each router a unique router-id, so we can use Go Text template again. The router-id values are written in separate variables file (with `_vars` added to the name):
 
 ```
 updates:
