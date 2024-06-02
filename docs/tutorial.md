@@ -455,6 +455,7 @@ interface:
   - name: ethernet-1/21.0
 ```
 
+Using either one of configuration files, we can update the configuring using gNMIc flag `--update-file`:
 
 ```
 $ gnmic -a router2,router3 set \
@@ -480,22 +481,29 @@ PING 192.168.3.1 (192.168.3.1) 56(84) bytes of data.
 Use flat format to verify configuration:
 
 ```
-$ gnmic -a router2 get --path /interface[name=ethernet-1/21]/subinterface[index=0] -t config --format flat
-srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/admin-state: enable
-srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/address.0/ip-prefix: 192.168.2.1/24
-srl_nokia-interfaces:interface[name=ethernet-1/21]/subinterface[index=0]/ipv4/admin-state: enable
+$ gnmic -a router1,router2,router3 get --path /network-instance[name=default] -t
+config --format flat
+[router3] srl_nokia-network-instance:network-instance[name=default]/admin-state: enable
+[router3] srl_nokia-network-instance:network-instance[name=default]/interface.0/name: ethernet-1/21.0
+[router3]
+[router1] srl_nokia-network-instance:network-instance[name=default]/admin-state: enable
+[router1] srl_nokia-network-instance:network-instance[name=default]/interface.0/name: ethernet-1/21.0
+[router1]
+[router2] srl_nokia-network-instance:network-instance[name=default]/admin-state: enable
+[router2] srl_nokia-network-instance:network-instance[name=default]/interface.0/name: ethernet-1/21.0
+[router2]
 ```
 
-**Saving configuration**
+### Saving Configuration
 
 
-At this point, you may be wondering how to save the configuration. You can log into teh router and save the configuration using the CLI.
+At this point, you may be wondering how to save the router configuration. You can log into the router and save the configuration using the CLI.
 
 ```
 A:router1# save startup
 ```
 
-However, containerlab provides a conveinet way to save the configuration for all routers at once using the `save` command:
+However, containerlab provides a convenient way to save the configuration for all routers at once using the `save` command:
 
 ```
 $ sudo clab save
@@ -513,21 +521,20 @@ INFO[0004] saved SR Linux configuration from router2 node. Output:
     Saved current running configuration as initial (startup) configuration '/etc/opt/srlinux/config.json'
 ```
 
-The output shows that the startup configuration is save in router's directory `/etc/opt/srlinux/config.json`. In your host machine, this file is saved under individual router's directory in the
-`clab-lab1` director.
+The output shows that the startup configuration is save in router's directory `/etc/opt/srlinux/config.json`. In your host machine, this file is saved under individual router's directory in the `clab-lab1` directory.
 
-**CAUTION:** Exiting the lab using `destroy --clean-up` option, will remove the `clab-lab1`. DO NOT use this this option until after you complete the lab. Instead, you can stop the lab, if you need to, using:
+**CAUTION:** Exiting the lab using `destroy --clean-up` option, will remove the `clab-lab1`. DO NOT use this this option until after you complete the lab. Instead, you can stop the lab, if needed, using:
 
 ```
 $ sudo clab destroy
 ```
 
 
-**More interfaces**
+## More Interface Configuration
 
-Now we need to configure the remaining interfaces between each pair of routers. Since now we now all the elements needed for the configuration, we can create a JSON (or YAML) file that perfrom all thress steps needed.
+Now we need to configure the remaining interfaces between each pair of routers. Since we now all the elements needed for the configuration, we can create a JSON (or YAML) file that perform all the steps needed.
 
-Edit a file `all_interfaces.yaml`:
+Edit a file `interfaces_config.yaml` as follows:
 
 ```
 interface:
@@ -554,36 +561,20 @@ interface:
           ip-prefix: 10.0.0.9/30
 ```
 
-Use the `set` command and the `--update-path` as before, but we now add a new flag `--update-file`, which reads the configuration from the YAML file we just created.
+Notice that the file includes the configuration for two interfaces. To use this file, we have to use the flag `--update-path` with path '/' since interface is one of the top nodes in the YANG models (see [Using get Command] section).
 
 ```
-$ gnmic -a router1 set --update-path / --update-file all_interfaces.yaml
+$ gnmic -a router1 set --update-path / --update-file config/interfaces_config.yaml
 ```
 
-or
+
+To verify, use the following command, which will list all configured interfaces on the router1:
 
 ```
-$ gnmic -a router1 set --update-path /interface[name=ethernet-1/11] --update-file interface_config.yaml
-{
-  "source": "router1",
-  "timestamp": 1716849281093866469,
-  "time": "2024-05-27T19:34:41.093866469-03:00",
-  "results": [
-    {
-      "operation": "UPDATE",
-      "path": "interface[name=ethernet-1/11]"
-    }
-  ]
-}
+$ gnmic -a router1 get --path /interface -t config --format flat
 ```
 
-Verify:
-
-```
-$ gnmic -a router1 get --path /interface -t config
-```
-
-#### Request-file
+### Using `request-file` Flag
 
 
 The `--request-file` flag will simplify the process even further by combining multiple paths and operations, update, replace or delete in one file.
