@@ -106,12 +106,17 @@ Repeat the command using the `flat` option:
 
 ```
 A:router1# diff flat
+```
+
+<details>
+<summary>Output</summary>      
 insert / interface ethernet-1/21 subinterface 0
 insert / interface ethernet-1/21 subinterface 0 admin-state enable
 insert / interface ethernet-1/21 subinterface 0 ipv4
 insert / interface ethernet-1/21 subinterface 0 ipv4 admin-state enable
 insert / interface ethernet-1/21 subinterface 0 ipv4 address 192.168.1.1/24
 ```
+</details>
 
 The `set` command updates the configuration as follows:
 
@@ -585,6 +590,9 @@ Now we need to configure the remaining interfaces between each pair of routers. 
 
 Edit a file `interfaces_config.yaml` as follows:
 
+<details>
+<summary>interfaces_config.yaml</summary>      
+
 ```yaml
 interface:
 - admin-state: enable
@@ -609,6 +617,7 @@ interface:
         address:
           ip-prefix: 10.0.0.9/30
 ```
+</details>
 
 Notice that the file includes the configuration for two interfaces. To use this file, we have to use the flag `--update-path` with path '/' since interface is one of the top nodes in the YANG models (see [Using get Command] section).
 
@@ -627,6 +636,9 @@ $ gnmic -a router1 get --path /interface -t config --format flat
 
 
 The `--request-file` flag simplifies the configuration process further by combining multiple paths and operations (update, replace or delete) in one file. The configuration file that can be used for router2 looks like the following:
+
+<details>
+<summary>See the file</summary>      
 
 ```yaml
 updates:
@@ -658,6 +670,7 @@ updates:
         - name: ethernet-1/11.0
         - name: ethernet-1/12.0
 ```
+</details>
 
 The file includes these components:
 
@@ -670,6 +683,9 @@ The file creates a subinterface for two interfaces connecting the routers then a
 One of the features of the `--request-file` is the ability to add per-target template variables using a [Go Text template](https://developer.hashicorp.com/nomad/tutorials/templates/go-template-syntax).
 
 In the previous file, we need to set the IP address for each interface and for each router, so we will need a file for each router. We can use templates to automate this process. Without going into the details of the Go Template syntax, the above file can be modified as follows:
+
+<details>
+<summary>See the files</summary>      
 
 ```yaml
 updates:
@@ -692,9 +708,12 @@ updates:
         name: {{ index $interface "name" }}{{".0"}}
 {{- end }}
 ```
-
+</details>
 
 The variables file will include the values needed for each router/interface:
+
+<details>
+<summary>See the file</summary>      
 
 ```yaml
 router1:
@@ -724,6 +743,7 @@ router3:
       description: "router3_to_router2"
       ipv4-prefix: "10.0.0.10/30"
 ```
+</details>
 
 Use the following `set` command for router1, router2, and router3.
 
@@ -742,6 +762,9 @@ $ gnmic -a router1,router2,router3 get --path /interface -t config --format flat
 
 
 We will use the last technique to configure OSPF. The file `ospf_config.yaml` includes basic OSPF configuration that we can use with the command `set --request-file` to configure each router. We will need to assign each router a unique router-id, so we can use Go Text template again. The router-id values are written in separate variables file (with `_vars` added to the name):
+
+<details>
+<summary>ospf_config.yaml</summary>      
 
 ```
 updates:
@@ -763,8 +786,10 @@ updates:
         - admin-state: enable
           interface-name: ethernet-1/21.0
 ```
+</details>
 
-The variables file `ospf_config_vars.yaml`:
+<details>
+<summary>interfaces_config_vars.yaml</summary>      
 
 ```
 router1:
@@ -774,6 +799,7 @@ router2:
 router3:
   router-id: 3.3.3.3  
 ```
+</details>
 
 Finally, we apply the OSPF configuration:
 
