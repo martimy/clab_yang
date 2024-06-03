@@ -685,7 +685,7 @@ One of the features of the `--request-file` is the ability to add per-target tem
 In the previous file, we need to set the IP address for each interface and for each router, so we will need a file for each router. We can use templates to automate this process. Without going into the details of the Go Template syntax, the above file can be modified as follows:
 
 <details>
-<summary>See the files</summary>      
+<summary>interfaces_request.yaml</summary>      
 
 ```yaml
 updates:
@@ -713,7 +713,7 @@ updates:
 The variables file will include the values needed for each router/interface:
 
 <details>
-<summary>See the file</summary>      
+<summary>interfaces_request_vars.yaml</summary>      
 
 ```yaml
 router1:
