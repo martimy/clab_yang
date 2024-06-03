@@ -789,7 +789,7 @@ updates:
 </details>
 
 <details>
-<summary>interfaces_config_vars.yaml</summary>      
+<summary>ospf_config_vars.yaml</summary>      
 
 ```
 router1:
