@@ -764,10 +764,10 @@ $ gnmic -a router1,router2,router3 get --path /interface -t config --format flat
 ### Configure OSPF
 
 
-We will use the last technique to configure OSPF. The file `ospf_config.yaml` includes basic OSPF configuration that we can use with the command `set --request-file` to configure each router. We will need to assign each router a unique router-id, so we can use Go Text template again. The router-id values are written in separate variables file (with `_vars` added to the name):
+We will use the last technique to configure OSPF. The file `ospf_request.yaml` includes basic OSPF configuration that we can use with the command `set --request-file` to configure each router. We will need to assign each router a unique router-id, so we can use Go Text template again. The router-id values are written in separate variables file (with `_vars` added to the name):
 
 <details>
-<summary>ospf_config.yaml</summary>      
+<summary>ospf_request.yaml</summary>      
 
 ```
 updates:
@@ -792,7 +792,7 @@ updates:
 </details>
 
 <details>
-<summary>ospf_config_vars.yaml</summary>      
+<summary>ospf_request_vars.yaml</summary>      
 
 ```
 router1:
@@ -807,7 +807,7 @@ router3:
 Finally, we apply the OSPF configuration:
 
 ```
-$ gnmic -a router1,router2,router3 set --request-file ospf_config.yaml
+$ gnmic -a router1,router2,router3 set --request-file ospf_request.yaml
 ```
 
 This concludes all configuration required to establish end-to-end connectivity between all hosts in the network. You can verify this using ping:
@@ -862,9 +862,7 @@ If you wnat to skip all the above process and complete all configuration at once
 2. Use gNMIc `set-request` with the files `net_request.yaml` and `net_request_vars.yaml`
 
    ```bash
-   $ gnmic -a router1,router2,router3 set --request-file config/net_request.yaml 
+   $ gnmic -a router1,router2,router3 set --request-file config/net_request.yaml
    ```
 
 That is it!
-
-
