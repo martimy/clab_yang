@@ -855,7 +855,7 @@ This concludes the tutorial.
 
 ## Putting it all together
 
-If you want to skip all the above process and complete all configuration at once, follow these steps after deploying the lab:
+All the above configuration steps can be completed with one file. So, the next time you want to configure the routers, you may skip all the above process and follow these two steps:
 
 1. Ensure the gNMIc environment variables are set:
 
@@ -863,7 +863,7 @@ If you want to skip all the above process and complete all configuration at once
    $ source env.sh
    ```
 
-2. Use gNMIc `set-request` with the files `net_request.yaml` and `net_request_vars.yaml`
+2. Use gNMIc `set` command with the files `net_request.yaml` and `net_request_vars.yaml`
 
    ```bash
    $ gnmic -a router1,router2,router3 set --request-file config/net_request.yaml
