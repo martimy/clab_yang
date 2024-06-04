@@ -23,6 +23,10 @@ To stop the lab:
 $ sudo clab destroy [-t lab1.clab.yaml]
 ```
 
+**Quick Configuration:**
+
+If you configure the routers quickly (maybe to continue with other tasks), jump to the last section: [Putting it all together]. Otherwise, please continue on with the following sections.
+
 ## YANG Support
 
 SR Linux is built to support YANG data models. Therefore, all management interfaces (CLI, gNMI, and JSON-RPC) are based on a common YANG models for configuration, state, and operational tasks. For example, the CLI command tree is derived the YANG models loaded into the system and a gNMI client can use the models to configure the system.
@@ -851,7 +855,7 @@ This concludes the tutorial.
 
 ## Putting it all together
 
-If you wnat to skip all the above process and complete all configuration at once, follow these steps after deploying the lab:
+If you want to skip all the above process and complete all configuration at once, follow these steps after deploying the lab:
 
 1. Ensure the gNMIc environment variables are set:
 
