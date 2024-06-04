@@ -2,9 +2,12 @@
 
 This tutorial will guide you through the steps of configuring Nokia srlinux routers using the gNMIc and YANG models.
 
-The containerlab toplogy file `lab1.clab.yaml` creates the ring topology shown in the figure below:
+The containerlab topology file `lab1.clab.yaml` creates the ring topology shown in the figure below:
 
 ![Topology](ring2.png)
+
+
+If you need any more information about configuring srlinux routers, consult [Nokia SR Linux 23.10 Configuration Basics](https://documentation.nokia.com/srlinux/23-10/title/basics.html).
 
 ## Stating and Stopping the Lab
 
@@ -846,6 +849,22 @@ $ gnmic -a router1 get --path /network-instance[name=default]/route-table
 
 This concludes the tutorial.
 
-## Links
+## Putting it all together
 
-- [Nokia SR Linux 23.10 Configuration Basics](https://documentation.nokia.com/srlinux/23-10/title/basics.html)
+If you wnat to skip all the above process and complete all configuration at once, follow these steps after deploying the lab:
+
+1. Ensure the gNMIc environment variables are set:
+
+   ```bash
+   $ source env.sh
+   ```
+
+2. Use gNMIc `set-request` with the files `net_request.yaml` and `net_request_vars.yaml`
+
+   ```bash
+   $ gnmic -a router1,router2,router3 set --request-file config/net_request.yaml 
+   ```
+
+That is it!
+
+

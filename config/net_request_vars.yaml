@@ -1,0 +1,38 @@
+router1:
+  router-id: 1.1.1.1
+  interfaces:
+    - name: ethernet-1/11
+      description: "router1_to_router2"
+      ipv4-prefix: "10.0.0.5/30"
+    - name: ethernet-1/12
+      description: "router1_to_router3"
+      ipv4-prefix: "10.0.0.14/30"
+    - name: ethernet-1/21
+      description: "router1_to_host1"
+      ipv4-prefix: "192.168.1.1/24"
+
+router2:
+  router-id: 2.2.2.2
+  interfaces:
+    - name: ethernet-1/11
+      description: "router2_to_router3"
+      ipv4-prefix: "10.0.0.9/30"
+    - name: ethernet-1/12
+      description: "router2_to_router1"
+      ipv4-prefix: "10.0.0.6/30"
+    - name: ethernet-1/21
+      description: "router2_to_host2"
+      ipv4-prefix: "192.168.2.1/24"
+      
+router3:
+  router-id: 3.3.3.3
+  interfaces:
+    - name: ethernet-1/11
+      description: "router3_to_router1"
+      ipv4-prefix: "10.0.0.13/30"
+    - name: ethernet-1/12
+      description: "router3_to_router2"
+      ipv4-prefix: "10.0.0.10/30"
+    - name: ethernet-1/21
+      description: "router3_to_host3"
+      ipv4-prefix: "192.168.3.1/24"
