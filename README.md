@@ -2,8 +2,6 @@
 
 The objective of this lab is to configure Nokia SR Linux routers using gNMIc interface and YANG models.
 
-**This lab is being updated regularly, so please make sure you watch for updates.**
-
 
 ## Background
 
