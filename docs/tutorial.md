@@ -25,28 +25,28 @@ $ sudo clab destroy [-t lab1.clab.yaml]
 
 **Quick Configuration:**
 
-If you configure the routers quickly (maybe to continue with other tasks), jump to the last section: [Putting it all together]. Otherwise, please continue on with the following sections.
+If you wish to configure the routers quickly (maybe to continue with other tasks), jump to the last section: [Putting it all together]. Otherwise, please continue on with the following sections.
 
 ## YANG Support
 
-SR Linux is built to support YANG data models. Therefore, all management interfaces (CLI, gNMI, and JSON-RPC) are based on a common YANG models for configuration, state, and operational tasks. For example, the CLI command tree is derived the YANG models loaded into the system and a gNMI client can use the models to configure the system.
+SR Linux is built to support YANG data models. Therefore, all management interfaces (CLI, gNMI, and JSON-RPC) are based on a common YANG models for configuration, state, and operational tasks. For example, the CLI command tree is derived from the YANG models loaded into the system and a gNMI client can use the models to configure the system.
 
 SR Linux supports the following YANG data models:
 
 - Nokia vendor-specific data models
 - OpenConfig vendor-neutral data models
 
-You can use the OpenConfig data models together with the SR Linux data models to configure network elements, using a CLI console or SSH connection or management-interface RPCs (gNMI) for communications between the clients and routers. The SR Linux data models offer a more complete representation of the capabilities of the SR Linux network elements, because they include vendor-specific features and functions that the OpenConfig data models do not describe.
+You can use the OpenConfig data models together with the SR Linux data models to configure network elements, using a CLI console or SSH connection or management-interface RPCs (gNMI) for communications between the clients and routers. The SR Linux data models offer more complete representation of the capabilities of the SR Linux network elements, because they include vendor-specific features and functions that the OpenConfig data models do not describe.
 
 
 ## Configuration Tasks
 
 This tutorial will guide you through the steps of configuring the devices in the network so that hosts will be able to communicate with each other. The configuration tasks include:
 
-- Configuring interfaces and subinterfaces (assign IPv4 addresses).
+- Configuring interfaces and subinterfaces (assigning IPv4 addresses).
 - Configuring OSPF routing protocol.
 
-Note that the containerlab (using the topology file) assigns names to devices and IP addresses to the hosts. It also connects all devices to a management network 172.20.20.0/24 through the devices' management interface. All configuration tasks in the tutorial are performed through the management network.
+Note that the containerlab (using the topology file) assigns names to devices and IP addresses to the hosts. It also connects all devices to a management network 172.20.20.0/24 through the devices' management interface. All configuration tasks in this tutorial are performed through the management network.
 
 Before proceeding with this lab, please review this [Introduction to Nokia SR Linux](https://martimy.github.io/clab_srl_dcn/srlinux.html).
 
@@ -56,9 +56,9 @@ Interface configuration on the srlinux router involves three steps.
 
 1. Create a subinterface: each router interface must have at least one subinterface. If VLANs are disabled on the interface, then only one subinterface is needed.
 2. Configure an IPv4 address on the subinterface
-3. Enable both the parent interface and the subinterface. Also enable ipv4 address (the interface can have multiple addresses, each can be enabled individually).
+3. Enable both the parent interface and the subinterface. Also enable the IPv4 address (the interface can have multiple addresses, each can be enabled individually).
 
-Sine most people are familiar with using CLI to configure routers, this is where we will start. The srlinux was built to support YANG model from the ground up, so the CLI is based on YANG.
+Sine most people are familiar with using CLI (Command Line Interface) to configure routers, this is where we will start. The srlinux was built to support YANG model from the ground up, so the CLI is based on YANG.
 
 
 Make sure the lab is deployed (see above) then use SSH to login to router1 (you can also use `docker exec -it router1 sr_cli`):
@@ -69,7 +69,7 @@ $ ssh admin@router1
 
 The username/password, if required, are *admin/NokiaSrl1*.
 
-Once logged in, you will be in the running mode:
+Once logged in, you will be in the running mode (the bottom of the screen shows the current mode):
 
 ```
 Welcome to the srlinux CLI.
@@ -80,7 +80,7 @@ A:router1#
 Current mode: + running
 ```
 
-To make any configuration changes, you must enter the Candidate mode. Once inside the candidate mode (the bottom of the screen shows the current mode), you can update the configuration using the `set` command. Use the tab key to display a menu that shows all the next possible keywords then use the navigation keys to select the required keyword. At the end you need to type the address "192.168.1.1/24".
+To make any configuration changes, you must enter the candidate mode. Once inside the candidate mode, you can update the configuration using the `set` command. Use the tab key to display a menu that shows all the next possible keywords then use the navigation keys to select the required keyword. At the end you need to type the address "192.168.1.1/24".
 
 ```
 Welcome to the srlinux CLI.
@@ -127,8 +127,8 @@ insert / interface ethernet-1/21 subinterface 0 ipv4 address 192.168.1.1/24
 
 The `set` command updates the configuration as follows:
 
-- Creates a subinterface 0 for the parent interface `ethernet-1/21` and enables it (the parent interface is enabled by clab).
-- Creates an IPv4 address and enables it as well.
+- Creates a subinterface 0 for the parent interface `ethernet-1/21` and enable it (the parent interface is enabled by clab).
+- Creates an IPv4 address and enable it as well.
 
 
 These configuration changes are not committed yet, so they have no affect on the running configuration. To commit the changes, use `commit now`, which will apply the configuration and move you back to the running mode (if the configuration includes error, you will not be able to commit the changes).
@@ -164,7 +164,7 @@ Connection to router1 closed.
 
 ### Introducing gNMIc
 
-gNMIc is a gNMI (gRPC Network Management Interface) CLI (Command Line Interface) client and collector. It provides full support for gNMI RPCs (Remote Procedure Calls) including Capabilities, Get, Set, and Subscribe. Please consult the [gNMIc documentation](https://gnmic.openconfig.net/) for details.
+gNMIc is a gNMI (gRPC Network Management Interface) CLI client and collector. It provides full support for gNMI RPCs (Remote Procedure Calls) including Capabilities, Get, Set, and Subscribe. Please consult the [gNMIc documentation](https://gnmic.openconfig.net/) for details.
 
 ![gnmic](rpc_gnmic.png)
 
