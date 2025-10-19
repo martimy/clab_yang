@@ -35,3 +35,7 @@ Follow the instructions in this [tutorial](docs/tutorial.md) to start lab and co
 ## Links
 
 - [Nokia SR Linux 23.10 Configuration Basics](https://documentation.nokia.com/srlinux/23-10/title/basics.html)
+
+## Author
+
+Created by Maen Artimy - [Personal Blog](http://adhocnode.com)
