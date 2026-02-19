@@ -4,10 +4,14 @@ A hands-on lab environment for configuring Nokia SR Linux routers using gNMIc an
 
 ## Prerequisites
 
-- Docker
-- Containerlab  
-- gNMIc
-- Basic YANG/gNMI knowledge
+To use this lab, you need to be familiar with the following:
+
+- [Docker](https://www.docker.com/)
+- [Containerlab](https://containerlab.dev/)
+- [Nokia SR Linux](https://www.nokia.com/networks/ip-networks/service-router-linux-NOS/)
+- [YANG](https://datatracker.ietf.org/doc/html/rfc7950)
+- [gNMI](https://github.com/openconfig/gnmi)
+- [gNMIc](https://gnmic.openconfig.net/)
 
 ## How to Navigate and Use This Repo
 
@@ -17,16 +21,6 @@ A hands-on lab environment for configuring Nokia SR Linux routers using gNMIc an
 4. Follow the steps: The tutorial will guide you to run gNMIc commands to configure the routers using YANG models.
 5. Experiment: Once the lab is running, you can explore the `config/` directory or modify the scripts to try your own configurations.
 
-## Background
-
-To use this lab, you must be familiar with the following:
-
-- [Docker](https://www.docker.com/)
-- [Containerlab](https://containerlab.dev/)
-- [Nokia SR Linux](https://www.nokia.com/networks/ip-networks/service-router-linux-NOS/)
-- [YANG](https://datatracker.ietf.org/doc/html/rfc7950)
-- [gNMI](https://github.com/openconfig/gnmi)
-- [gNMIc](https://gnmic.openconfig.net/)
 
 ## Installation
 
@@ -53,5 +47,6 @@ Follow the instructions in this [tutorial](docs/tutorial.md) to start lab and co
 ## Author
 
 Created by Maen Artimy - [Personal Blog](http://adhocnode.com)
+
 
 
