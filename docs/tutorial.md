@@ -113,17 +113,13 @@ Repeat the command using the `flat` option:
 
 ```
 A:router1# diff flat
-```
-
-<details>
-<summary>Output</summary>      
+    
 insert / interface ethernet-1/21 subinterface 0
 insert / interface ethernet-1/21 subinterface 0 admin-state enable
 insert / interface ethernet-1/21 subinterface 0 ipv4
 insert / interface ethernet-1/21 subinterface 0 ipv4 admin-state enable
 insert / interface ethernet-1/21 subinterface 0 ipv4 address 192.168.1.1/24
 ```
-</details>
 
 The `set` command updates the configuration as follows:
 
@@ -870,6 +866,7 @@ All the above configuration steps can be completed with one file. So, the next t
    ```
 
 That is it!
+
 
 
 
