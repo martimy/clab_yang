@@ -25,7 +25,7 @@ $ sudo clab destroy [-t lab1.clab.yaml]
 
 **Quick Configuration:**
 
-If you wish to configure the routers quickly (maybe to continue with other tasks), jump to the last section: [Putting it all together](#Putting it all together). Otherwise, please continue on with the following sections.
+If you wish to configure the routers quickly (maybe to continue with other tasks), jump to the last section: [Putting it all together](#putting-it-all-together). Otherwise, please continue on with the following sections.
 
 ## YANG Support
 
@@ -870,4 +870,5 @@ All the above configuration steps can be completed with one file. So, the next t
    ```
 
 That is it!
+
 
