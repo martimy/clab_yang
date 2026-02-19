@@ -15,7 +15,7 @@ To use this lab, you need to be familiar with the following:
 
 ## How to Navigate and Use This Repo
 
-1. Start with the tutorial: Your main guide is the tutorial in [docs/tutorial.md]. It will walk you through the entire process.
+1. Start with the tutorial: Your main guide is the [tutorial](docs/tutorial.md). It will walk you through the entire process.
 2. Meet the prerequisites: Ensure you have a Linux machine with Docker, Containerlab, and gNMIc installed, as noted below.
 3. Clone and launch: Clone the repository and use the `lab1.clab.yaml` file with `containerlab deploy` to spin up the virtual network.
 4. Follow the steps: The tutorial will guide you to run gNMIc commands to configure the routers using YANG models.
@@ -47,6 +47,7 @@ Follow the instructions in this [tutorial](docs/tutorial.md) to start lab and co
 ## Author
 
 Created by Maen Artimy - [Personal Blog](http://adhocnode.com)
+
 
 
 
