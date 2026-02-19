@@ -1,6 +1,13 @@
 # Model-Driven Network Managment with gNMIc and YANG
 
-The objective of this lab is to configure Nokia SR Linux routers using gNMIc interface and YANG models.
+A hands-on lab environment for configuring Nokia SR Linux routers using gNMIc and YANG models on Containerlab.
+
+## Prerequisites
+
+- Docker
+- Containerlab  
+- gNMIc
+- Basic YANG/gNMI knowledge
 
 ## How to Navigate and Use This Repo
 
@@ -46,4 +53,5 @@ Follow the instructions in this [tutorial](docs/tutorial.md) to start lab and co
 ## Author
 
 Created by Maen Artimy - [Personal Blog](http://adhocnode.com)
+
 
