@@ -36,7 +36,7 @@ SR Linux supports the following YANG data models:
 - Nokia vendor-specific data models
 - OpenConfig vendor-neutral data models
 
-You can use the OpenConfig data models together with the SR Linux data models to configure network elements, using a CLI console or SSH connection or management-interface RPCs (gNMI) for communications between the clients and routers. The SR Linux data models offer more complete representation of the capabilities of the SR Linux network elements, because they include vendor-specific features and functions that the OpenConfig data models do not describe.
+You can use the OpenConfig data models together with the native SR Linux data models to configure network elements, using a CLI console or SSH connection or management-interface RPCs (gNMI) for communications between the clients and routers. The SR Linux data models offer more complete representation of the capabilities of the SR Linux network elements, because they include vendor-specific features and functions that the OpenConfig data models do not describe.
 
 
 ## Configuration Tasks
@@ -54,11 +54,11 @@ Before proceeding with this lab, please review this [Introduction to Nokia SR Li
 
 Interface configuration on the srlinux router involves three steps.
 
-1. Create a subinterface: each router interface must have at least one subinterface. If VLANs are disabled on the interface, then only one subinterface is needed.
+1. Create a subinterface: each router interface must have at least one subinterface. If VLANs are disabled on the interface, then only one subinterface is allowd.
 2. Configure an IPv4 address on the subinterface
 3. Enable both the parent interface and the subinterface. Also enable the IPv4 address (the interface can have multiple addresses, each can be enabled individually).
 
-Sine most people are familiar with using CLI (Command Line Interface) to configure routers, this is where we will start. The srlinux was built to support YANG model from the ground up, so the CLI is based on YANG.
+Since most people are familiar with using CLI (Command Line Interface) to configure routers, this is where we will start. The srlinux was built to support YANG model from the ground up, so the CLI is based on YANG.
 
 
 Make sure the lab is deployed (see above) then use SSH to login to router1 (you can also use `docker exec -it router1 sr_cli`):
@@ -80,7 +80,7 @@ A:router1#
 Current mode: + running
 ```
 
-To make any configuration changes, you must enter the candidate mode. Once inside the candidate mode, you can update the configuration using the `set` command. Use the tab key to display a menu that shows all the next possible keywords then use the navigation keys to select the required keyword. At the end you need to type the address "192.168.1.1/24".
+To make any configuration changes, you must enter the candidate mode. Once in the candidate mode, you can update the configuration using the `set` command. Use the tab key to display a menu that shows all the next possible keywords, then use the navigation keys to select the required keyword. At the end you need to type the address "192.168.1.1/24".
 
 ```
 Welcome to the srlinux CLI.
@@ -131,7 +131,7 @@ The `set` command updates the configuration as follows:
 - Creates an IPv4 address and enable it as well.
 
 
-These configuration changes are not committed yet, so they have no affect on the running configuration. To commit the changes, use `commit now`, which will apply the configuration and move you back to the running mode (if the configuration includes error, you will not be able to commit the changes).
+These configuration changes are not active yet, so they have no affect on the running configuration. To commit the changes, use `commit now`, which will apply the configuration and move you back to the running mode (if the configuration includes error, you will not be able to commit the changes).
 
 ```
 A:router1# commit now
@@ -870,5 +870,6 @@ All the above configuration steps can be completed with one file. So, the next t
    ```
 
 That is it!
+
 
 
